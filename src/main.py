@@ -1,7 +1,6 @@
 import os
 import random
 from faker import Faker
-import file_operations
 
 
 SKILLS = [
@@ -94,13 +93,16 @@ TEMPLATE_PATH = "charsheet.svg"
 def replace_font(text, mapping):
     return ''.join([mapping.get(char, char) for char in text])
 
+
 def read_file(filename):
     with open(filename, encoding='utf8') as file_:
         return file_.read()
 
+
 def write_to_file(filename, content):
     with open(filename, 'w', encoding='utf8') as file_:
         return file_.write(content)
+
 
 def render_template(template_path, output_path, context):
     content = read_file(template_path)
@@ -108,6 +110,7 @@ def render_template(template_path, output_path, context):
         placeholder = '{%s}' % key
         content = content.replace(placeholder, str(value))
     write_to_file(output_path, content)
+
 
 def generate_character(fake, runic_skills):
     selected_skills = random.sample(runic_skills, 3)
@@ -135,6 +138,7 @@ def generate_character(fake, runic_skills):
         "skill_3": selected_skills[2]
     }
 
+
 def main():
     fake = Faker("ru_RU")
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -148,6 +152,7 @@ def main():
         context = generate_character(fake, runic_skills)
         output_path = os.path.join(OUTPUT_DIR, f"result_{i}.svg")
         render_template(TEMPLATE_PATH, output_path, context)
+
 
 if __name__ == '__main__':
     main()

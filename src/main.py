@@ -1,10 +1,8 @@
-# Импорты
-import file_operations
 import os
 import random
 from faker import Faker
+import file_operations
 
-# Объявления глобальных констант
 SKILLS = [
     'Стремительный прыжок',
     'Электрический выстрел',
@@ -45,67 +43,64 @@ LETTERS_MAPPING = {
 OUTPUT_DIR = "../output"
 TEMPLATE_PATH = "charsheet.svg"
 
-# Объявления функций
+
 def replace_font(text, mapping):
-    """Заменяет символы в тексте согласно переданному mapping."""
     return ''.join([mapping.get(char, char) for char in text])
 
-
 def read_file(filename):
-    """Читает содержимое файла."""
     with open(filename, encoding='utf8') as file_:
         return file_.read()
 
-
 def write_to_file(filename, content):
-    """Записывает содержимое в файл."""
     with open(filename, 'w', encoding='utf8') as file_:
         return file_.write(content)
 
-
 def render_template(template_path, output_path, context):
-    """Заменяет подсказки в шаблоне на значения из context и сохраняет результат."""
     content = read_file(template_path)
     for key, value in context.items():
-        content = content.replace('{%s}' % key, str(value))
+        placeholder = '{%s}' % key
+        content = content.replace(placeholder, str(value))
     write_to_file(output_path, content)
 
-
 def generate_character(fake, runic_skills):
-    """Генерирует данные для одного персонажа."""
     selected_skills = random.sample(runic_skills, 3)
+    first_name = fake.first_name()
+    last_name = fake.last_name()
+    job = fake.job()
+    town = fake.city()
+    strength = random.randint(3, 18)
+    agility = random.randint(3, 18)
+    endurance = random.randint(3, 18)
+    intelligence = random.randint(3, 18)
+    luck = random.randint(3, 18)
     return {
-        "first_name": fake.first_name(),
-        "last_name": fake.last_name(),
-        "job": fake.job(),
-        "town": fake.city(),
-        "strength": random.randint(3, 18),
-        "agility": random.randint(3, 18),
-        "endurance": random.randint(3, 18),
-        "intelligence": random.randint(3, 18),
-        "luck": random.randint(3, 18),
+        "first_name": first_name,
+        "last_name": last_name,
+        "job": job,
+        "town": town,
+        "strength": strength,
+        "agility": agility,
+        "endurance": endurance,
+        "intelligence": intelligence,
+        "luck": luck,
         "skill_1": selected_skills[0],
         "skill_2": selected_skills[1],
         "skill_3": selected_skills[2]
     }
 
-
 def main():
-    """Основная функция программы."""
     fake = Faker("ru_RU")
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    # Преобразуем навыки в стилизованный шрифт
-    runic_skills = [replace_font(skill, LETTERS_MAPPING) for skill in SKILLS]
+    runic_skills = []
+    for skill in SKILLS:
+        runic_skill = replace_font(skill, LETTERS_MAPPING)
+        runic_skills.append(runic_skill)
 
-    # Генерация персонажей
     for i in range(1, 11):
         context = generate_character(fake, runic_skills)
         output_path = os.path.join(OUTPUT_DIR, f"result_{i}.svg")
         render_template(TEMPLATE_PATH, output_path, context)
-        print(f"Сгенерирован файл: {output_path}")
 
-
-# Остальной код
 if __name__ == '__main__':
     main()
